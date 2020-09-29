@@ -7,34 +7,41 @@ from genie.testbed import load
 from rich.table import Table
 from rich.progress import Progress
 from openpyxl.styles import *
+from openpyxl import load_workbook
 from netmiko import ConnectHandler
-import csv
-import openpyxl
-from threading import Thread
-import time
 from alive_progress import alive_bar
+from datetime import *
+import openpyxl
+import time
+import csv
+
+
+### Displays System Time when called ###
+date_today = datetime.today()
+time_now = datetime.now()
+Dtime = time_now.strftime("%H:%M:%S")
+
 
 ### File path for config.yaml ###
-config_file_yaml ="/home/shebin/NETDEVOPS/Net_automation_Project/Network_Heath_Check/config.yaml"
+#config_file_yaml="/home/shebin/NETDEVOPS/Net_automation_Project/Network_Heath_Check/config.yaml"
 
 ### File path for all the Branch Ip Address which we will ping from central server to check connectivity ###
 ip_address_loopup_for_pinging = "/home/shebin/NETDEVOPS/Net_automation_Project/csv_files/branch_ipaddress.csv"
 
-### Final result Device Up or Down result will be stored here
-final_reault_of_Health_Check =  "/home/shebin/NETDEVOPS/Net_automation_Project/Network_Heath_check/csv_files/finale_result_health.csv"
+### Final result Device Up or Down result will be stored here  in csv ###
+final_result_of_Health_Check="/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/"+str(date_today)+'__'+"final_result.csv"
 
+#### Final Result Path of Excell file with color based on Device Status ###
+ping_result="/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/"+str(date_today)+'__'+"ping_result.xlsx"
 
 
 ### Initilizing nornir object ###
-nr = InitNornir(config_file=config_file_yaml)
-
+nr = InitNornir(config_file="/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/config.yaml")
 
 
 ### Reading Total number of Rows in CSV files ###
 file = open(ip_address_loopup_for_pinging)
 num_rows = len(file.readlines())
-
-
 
 
 ### Rich Variable for styles&tabels ###
@@ -54,13 +61,12 @@ cli_table.add_column("IP_ADDRESS", justify="right", style="cyan", no_wrap=True)
 cli_table.add_column("HEALTH_STATUS", justify="right", style="cyan", no_wrap=True)
 
 
-
 ### Header fields for csv file where ping result will be stored ###
 report_fields = ['SOL_ID','IP_ADDRESS','BRANCH_NAME','HEALTH_STATUS','TIME']
 
 
-### Opening and writing Results to Csv File ###
-with open(final_reault_of_Health_Check,'a+')as wr:
+### Opening and writing Headers to Csv File ###
+with open(final_result_of_Health_Check,'a')as wr:
     csv_dictwrite = csv.DictWriter(wr,report_fields)
     csv_dictwrite.writeheader()
 
@@ -87,24 +93,39 @@ def Network_Health_Check(task):
         with open(ip_address_loopup_for_pinging,'r')as re:
             csv_d_reader = csv.DictReader(re)
             for row in csv_d_reader:
-
-                row_values={'ip' : row['IP_ADDRESS'],'solid' :  row['Sol_ID'],'branch' : row['Branch_Name']}
+                 
+                row_values={'ip' : row['IP_ADDRESS'],'solid' : row['Sol_ID'],'branch' : row['Branch_Name']}
                 res = task.run(netmiko_send_command,command_string='ping '+row_values['ip'])
                 ping_search = res.result
                 if not '!!!' in ping_search:
+
+                    ### Opening and writing Headers to Csv File ###
+                    with open(final_result_of_Health_Check,'a+')as wr:
+                       csv_dictwrite = csv.DictWriter(wr,report_fields)
+                       csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'DOWN','TIME':Dtime})
                     
-                    sol_id_down = style_down+row_values['solid']
-                    branch_down = style_down+row_values['branch']
-                    ip_down = style_down+row_values['ip']
-                    cli_table.add_row(sol_id_down,branch_down,ip_down,status_down)
+                    
+                       sol_id_down = style_down+row_values['solid']
+                       branch_down = style_down+row_values['branch']
+                       ip_down = style_down+row_values['ip']
+                       cli_table.add_row(sol_id_down,branch_down,ip_down,status_down)
+              
 
                                         
                 else:
+
+                    ### Opening and writing Headers to Csv File ###
+                    with open(final_result_of_Health_Check,'a+')as wr:
+                       csv_dictwrite = csv.DictWriter(wr,report_fields)
+                       csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'UP','TIME':Dtime})
+
                     
-                    sol_id_up = style_up+row_values['solid']
-                    branch_up = style_up+row_values['branch']
-                    ip_up = style_up+row_values['ip']
-                    cli_table.add_row(sol_id_up,branch_up,ip_up,status_up)
+                       sol_id_up = style_up+row_values['solid']
+                       branch_up = style_up+row_values['branch']
+                       ip_up = style_up+row_values['ip']
+                       cli_table.add_row(sol_id_up,branch_up,ip_up,status_up)
+
+
 
 ### Bar tracks/shows  ETA/Time needed to complete the execution ###    
                 bar()
@@ -113,8 +134,42 @@ def Network_Health_Check(task):
 
 
 result_of_ping = nr.run(Network_Health_Check)
-
 result_of_ping
-console.print()
-console.print()
 console.print(cli_table)
+
+### Now writing csv rows to Excell sheet and filling it with colors based on Status ###
+
+wb = openpyxl.Workbook()
+excell_sheet = wb.active
+
+
+with open(final_result_of_Health_Check,'r')as f:
+    reader = csv.reader(f)
+    for row in reader:
+        excell_sheet.append(row)
+
+wb.save(filename=ping_result)
+
+
+wk = load_workbook(ping_result)
+ws = wk.active
+
+### Counting maximum rows and coloums of excell_sheet ###
+
+max_rows = ws.max_row
+max_cols = ws.max_column
+
+### Iterating over excell rows and coloums to find Status  and fill it with color ###
+for r in range(1,max_rows+1):
+    for c in range(1,max_cols):
+        c_val = ws.cell(row=r,column=4).value
+        if c_val ==('DOWN' or  'down' or 'Down'):
+            ws.cell(row=r,column=4).fill=PatternFill(fgColor='FF0000',fill_type='solid')
+        elif c_val==('UP' or  'up' or 'Up'):
+            ws.cell(row=r,column=4).fill=PatternFill(fgColor='00FF00',fill_type='solid')
+        else:
+            pass
+
+### Saving the Changes ###
+wk.save(ping_result)
+
