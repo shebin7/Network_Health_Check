@@ -1,0 +1,11 @@
+---
+core:
+  num_workers: 50
+
+
+  
+inventory:
+  plugin: nornir.plugins.inventory.simple.SimpleInventory
+  options:
+    host_file: "/home/shebin/NETDEVOPS/Net_automation_Project/Inventory_files/hosts.yaml"
+    group_file: "/home/shebin/NETDEVOPS/Net_automation_Project/Inventory_files/groups.yaml"

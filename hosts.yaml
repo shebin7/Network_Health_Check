@@ -1,0 +1,10 @@
+---
+
+Server:
+  hostname: 192.168.122.12
+  username: shebin
+  password: shebin
+  platform: 'ios'
+
+  group:
+    - cisco_group
