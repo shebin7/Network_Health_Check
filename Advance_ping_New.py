@@ -23,7 +23,7 @@ Dtime = time_now.strftime("%H:%M:%S")
 
 
 ### File path for config.yaml ###
-#config_file_yaml="/home/shebin/NETDEVOPS/Net_automation_Project/Network_Heath_Check/config.yaml"
+config_file_yaml="/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/config.yaml"
 
 ### File path for all the Branch Ip Address which we will ping from central server to check connectivity ###
 ip_address_loopup_for_pinging = "/home/shebin/NETDEVOPS/Net_automation_Project/csv_files/branch_ipaddress.csv"
