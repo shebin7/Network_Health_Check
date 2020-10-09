@@ -1,5 +1,8 @@
 ![alt text](https://github.com/shebin7/Network_Health_Check/blob/master/Advance_Ping_Dev.gif)
 
+* Excell Output
+![alt text](https://github.com/shebin7/Network_Health_Check/blob/master/Snapshots/Excell_Status.png)
+
 ## Table of contents
 * [General info](#general-info)
 * [Technologies](#technologies)
