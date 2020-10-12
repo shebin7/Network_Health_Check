@@ -1,14 +1,11 @@
+from nornir import InitNornir
+from nornir_netmiko.tasks import netmiko_send_command,netmiko_send_config
+from nornir_utils.plugins.functions import print_result,print_title
 from rich.console import Console
 from rich.panel import Panel
-from nornir import InitNornir
-from nornir.plugins.tasks.networking import netmiko_send_config,netmiko_send_command
-from nornir.plugins.functions.text import print_result,print_title
-from genie.testbed import load
 from rich.table import Table
-from rich.progress import Progress
-from openpyxl.styles import *
 from openpyxl import load_workbook
-from netmiko import ConnectHandler
+from openpyxl.styles import *
 from alive_progress import alive_bar
 from datetime import *
 import openpyxl
@@ -99,7 +96,7 @@ def Network_Health_Check(task):
                 ping_search = res.result
                 if not '!!!' in ping_search:
 
-                    ### Opening and writing Headers to Csv File ###
+                    ### Opening New CSV and writing individual device 'Status' and their details ###
                     with open(final_result_of_Health_Check,'a+')as wr:
                        csv_dictwrite = csv.DictWriter(wr,report_fields)
                        csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'DOWN','TIME':Dtime})
@@ -112,9 +109,8 @@ def Network_Health_Check(task):
               
 
                                         
-                else:
-
-                    ### Opening and writing Headers to Csv File ###
+                else:                    
+                    ### Opening New CSV and writing individual device 'Status' and their details ###
                     with open(final_result_of_Health_Check,'a+')as wr:
                        csv_dictwrite = csv.DictWriter(wr,report_fields)
                        csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'UP','TIME':Dtime})

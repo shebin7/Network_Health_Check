@@ -1,11 +1,15 @@
 ---
-core:
-  num_workers: 50
 
-
-  
 inventory:
-  plugin: nornir.plugins.inventory.simple.SimpleInventory
+  plugin: SimpleInventory
   options:
     host_file: "/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/hosts.yaml"
     group_file: "/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/groups.yaml"
+
+
+runners:
+  plugin: threaded
+  options:
+    num_workers: 10
+
+
