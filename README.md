@@ -7,6 +7,7 @@
 * [General info](#general-info)
 * [Technologies](#technologies)
 * [Libraries](#libraries)
+* [Usage](#usage)
 * [Setup](#setup)
 * [Other Informations](#other-informations)
 
@@ -21,10 +22,27 @@ Also the output is saved in excell with color coding based on the Ping result.
 Project is created with:
 * Python 3.6.9
 
-Network Devices 
+Network Devices and Platforms
 * GNS3 IOU and IOS Devices
-* EVE-NG
-* CML2 Sandbox Lab (VIRL 2)
+* EVE-NG IOU and IOS Devices
+* CML2(VIRL 2) IOU and IOS Devices
+
+## Usage
+
+* When your Host/Laptop acts as a Centralized Server.
+
+  * Host(System/Laptop)------Network_Devices
+
+  When mirroring this in your'e System , you need to setup a topology on your Simulator of your choice having full connectivity with your Local System ip which is running this code , and save the ip address of Lan or Loopback ip of all the Devices running on Simulator in csv file and assign or copy-paste this csv file path as a value to variable 'branch_ip_address_for_pinging' then run the code.
+
+* When an Intermediate/Jump Server acts as Centralized Server.
+
+  * Host(System/Laptop)----Intermediate/Jump Server(Linux)----Network_Devices  
+
+  When mirroring this in your'e System , you need to setup a topology on your Simulator of your choice , you must have connectivity with the Jump Server and The Jump Server should have connectivity with the Network Device in Simulator,your Jump Server will act as an Intermediate Server and through it you will connect to Network Devices , but the code will run and excute in the Local System/Host itself. 
+
+
+  
 
 
 ## Libraries
