@@ -8,6 +8,8 @@
 * [Technologies](#technologies)
 * [Libraries](#libraries)
 * [Setup](#setup)
+* [Other Informations](#other-informations)
+
 
 ## General info
 This project allows the users to see which branch device is Live,it does this by a Ping test,the user first access the centralized server from where it has 
@@ -21,6 +23,8 @@ Project is created with:
 
 Network Devices 
 * GNS3 IOU and IOS Devices
+* EVE-NG
+* CML2 Sandbox Lab (VIRL 2)
 
 
 ## Libraries
@@ -40,4 +44,7 @@ Then run it from IDE or from Terminal
 ```
 $ python3 Network_Health_Check.py
 ```
+
+# Other Informations
+Working on adding an Option for Intermediate-Server or Jump-Server.
 
