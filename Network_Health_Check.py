@@ -4,6 +4,7 @@ from nornir_utils.plugins.functions import print_result,print_title
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+from rich.prompt import Prompt,IntPrompt
 from netmiko import ConnectHandler
 from openpyxl import load_workbook
 from openpyxl.styles import *
@@ -87,7 +88,8 @@ console.print()
 console.print('Working...',style='green')
 
 
-def Intermediate_Server_ping_pattern_catcher(result_string):  
+def Intermediate_Server_ping_pattern_catcher(result_string):
+    device_status = '' 
     template_path ='/home/shebin/NETDEVOPS/Net_automation_Project/TEXTFSM_NEW/ping_linux.textfsm'
     with open(template_path,'r')as tm:
         ping_template = textfsm.TextFSM(tm)
@@ -111,41 +113,65 @@ def Intermediate_Server_ping_pattern_catcher(result_string):
             count_exceed = count_exceed+1
 
     if count_ok > 6:
+        return device_status+'UP'
         
-
-        table.add_row()
     elif (count_unreach > 8) or (count_exceed > 8):
-        cli_table.add_row(sol_id_down,branch_down,ip_down,status_down)
+        return device_status+'DOWN'
+    
+
+Prompt_ASK = Prompt.ask("Enter ")
 
 
 def Intermediate_Server():
-    jump_server={'device_type':'terminal_server','ip':'192.168.4.133','username':'shebin','password':'shebin123','global_delay_factor':1}
+
+    pleae tel iip or default will be taken
+    jump_server={'device_type':'terminal_server','ip':str(server_ip),'username':str(server_username),
+    'password':str(server_password),'global_delay_factor':1}
     net_connect = ConnectHandler(**jump_server)
 
-    with open('jump sever file') as c:
-        [ass]
-    jump_server={'device_type':'terminal_server','ip':'192.168.4.133','username':'shebin','password':'shebin123','global_delay_factor':1}
     try:
         net_connect= ConnectHandler(**jump_server)
-        prompt_1 = net_connect.find_prompt()
+        with alive_bar(num_rows-1)as bar:
+        with open(branch_ip_address_for_pinging,'r')as b_ip:
+            csv_d_reader = csv.DictReader(b_ip)
+            for row in csv_d_reader:
+                row_values={'ip' : row['IP_ADDRESS'],'solid' : row['Sol_ID'],'branch' : row['Branch_Name']}
+           
+                net_connect.write_channel('ping 192.168.122.12 -c 10 \n')
 
-        with open('ip address file','r')as p:
-            pass
-        net_connect.write_channel('ping 192.168.122.12 -c 10 \n')
+                write_channel_op_1=net_connect._read_channel_timing(delay_factor=2,max_loops=150)
 
-        write_channel_op_1=net_connect._read_channel_timing(delay_factor=2,max_loops=150)
-        print(write_channel_op_1)
+                Device_Status=Intermediate_Server_ping_pattern_catcher(result_string=write_channel_op_1)
 
-        Intermediate_Server_ping_pattern_catcher(result_string=write_channel_op_1)
+                if 'DOWN' in Device_Status:
 
+                    with open(final_result_of_Health_Check,'a+')as wr:
 
+                        csv_dictwrite = csv.DictWriter(wr,report_fields)                        
+                        csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'DOWN','TIME':Dtime})
+                        sol_id_down = style_down+row_values['solid']
+                        branch_down = style_down+row_values['branch']
+                        ip_down = style_down+row_values['ip']
+                        cli_table.add_row(sol_id_down,branch_down,ip_down,status_down)
+                
+                else:
+                    
+                    with open(final_result_of_Health_Check,'a+')as wr:
+
+                        csv_dictwrite = csv.DictWriter(wr,report_fields)                        
+                        csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'DOWN','TIME':Dtime})
+                        sol_id_down = style_down+row_values['solid']
+                        branch_down = style_down+row_values['branch']
+                        ip_down = style_down+row_values['ip']
+                        cli_table.add_row(sol_id_up,branch_up,ip_up,status_up)
+                                          
     except Exception:
         print('Exception')
 
     finally:
         net_connect.disconnect()
 
-def Network_Health_Check(task):
+def Device_as_Server(task):
    with alive_bar(num_rows-1)as bar:
         with open(branch_ip_address_for_pinging,'r')as re:
             csv_d_reader = csv.DictReader(re)
