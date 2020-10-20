@@ -1,3 +1,5 @@
 *.csv
 *.xlsx
-*.xlsx#
+*.xlsx
+*.png
+
