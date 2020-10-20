@@ -4,6 +4,7 @@ from nornir_utils.plugins.functions import print_result,print_title
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+from netmiko import ConnectHandler
 from openpyxl import load_workbook
 from openpyxl.styles import *
 from alive_progress import alive_bar
@@ -23,7 +24,7 @@ Dtime = time_now.strftime("%H:%M:%S")
 config_file_yaml="/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/config.yaml"
 
 ### File path for all the Branch Ip Address which we will ping from central server to check connectivity ###
-ip_address_loopup_for_pinging = "/home/shebin/NETDEVOPS/Net_automation_Project/csv_files/branch_ipaddress.csv"
+branch_ip_address_for_pinging = "/home/shebin/NETDEVOPS/Net_automation_Project/csv_files/branch_ipaddress.csv"
 
 ### Final result Device Up or Down result will be stored here  in csv ###
 final_result_of_Health_Check="/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/"+str(date_today)+'__'+"final_result.csv"
@@ -37,7 +38,7 @@ nr = InitNornir(config_file="/home/shebin/NETDEVOPS/Net_automation_Project/Netwo
 
 
 ### Reading Total number of Rows in CSV files ###
-file = open(ip_address_loopup_for_pinging)
+file = open(branch_ip_address_for_pinging)
 num_rows = len(file.readlines())
 
 
@@ -85,9 +86,68 @@ console.print()
 console.print()
 console.print('Working...',style='green')
 
+
+def Intermediate_Server_ping_pattern_catcher(result_string):  
+    template_path ='/home/shebin/NETDEVOPS/Net_automation_Project/TEXTFSM_NEW/ping_linux.textfsm'
+    with open(template_path,'r')as tm:
+        ping_template = textfsm.TextFSM(tm)
+
+    result_ping  = ping_template.ParseText(result_string)
+
+    template_header= ping_template.header
+
+    dict_result = [dict(zip(template_header,i))for i in result_ping]
+
+    count_exceed=0
+    count_unreach=0
+    count_ok=0  
+    for i in dict_result:
+        if 'time' in str(i['result']):
+            count_ok=count_ok+1
+
+        elif 'Destination' in str(i['result']):
+            count_unreach =count_unreach+1
+        elif 'Time' in str(i['result']):
+            count_exceed = count_exceed+1
+
+    if count_ok > 6:
+        
+
+        table.add_row()
+    elif (count_unreach > 8) or (count_exceed > 8):
+        cli_table.add_row(sol_id_down,branch_down,ip_down,status_down)
+
+
+def Intermediate_Server():
+    jump_server={'device_type':'terminal_server','ip':'192.168.4.133','username':'shebin','password':'shebin123','global_delay_factor':1}
+    net_connect = ConnectHandler(**jump_server)
+
+    with open('jump sever file') as c:
+        [ass]
+    jump_server={'device_type':'terminal_server','ip':'192.168.4.133','username':'shebin','password':'shebin123','global_delay_factor':1}
+    try:
+        net_connect= ConnectHandler(**jump_server)
+        prompt_1 = net_connect.find_prompt()
+
+        with open('ip address file','r')as p:
+            pass
+        net_connect.write_channel('ping 192.168.122.12 -c 10 \n')
+
+        write_channel_op_1=net_connect._read_channel_timing(delay_factor=2,max_loops=150)
+        print(write_channel_op_1)
+
+        Intermediate_Server_ping_pattern_catcher(result_string=write_channel_op_1)
+
+
+    except Exception:
+        print('Exception')
+
+    finally:
+        net_connect.disconnect()
+
 def Network_Health_Check(task):
    with alive_bar(num_rows-1)as bar:
-        with open(ip_address_loopup_for_pinging,'r')as re:
+        with open(branch_ip_address_for_pinging,'r')as re:
             csv_d_reader = csv.DictReader(re)
             for row in csv_d_reader:
                  
