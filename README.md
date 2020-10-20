@@ -1,3 +1,6 @@
+[![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)](https://developer.cisco.com/codeexchange/github/repo/shebin7/Network_Health_Check)
+
+
 ![alt text](https://github.com/shebin7/Network_Health_Check/blob/master/Advance_Ping_Dev.gif)
 
 * Excell Output
@@ -15,8 +18,7 @@
 ## General info
 This project allows the users to see which branch device is Live,it does this by a Ping test,the user first access the centralized server from where it has 
 connectivity to all the Branch's Device,and then it runs a Ping to each and every device, The Programme looks for certain patterns form the Device response 
-If the pattern matches the programmes value it will be either considered as UP or DOWN based ont the pattern,and a summary table is presented to the user on console
-Also the output is saved in excell with color coding based on the Ping result.
+If the pattern matches the programmes value, it will be either considered as UP or DOWN based on the pattern,and a summary table is presented to the user on console Also the output is saved in excell with color coding based on the Ping result.
 
 ## Technologies
 Project is created with:
