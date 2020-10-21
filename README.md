@@ -36,15 +36,16 @@ Network Devices and Platforms
 * When your Host/Laptop acts as a Centralized Server.
 
   * Host(System/Laptop)------Network_Devices
+  ![alt text](https://github.com/shebin7/Network_Health_Check/blob/master/Snapshots/Direct.png)
+   
 
   When mirroring this in your'e System , you need to setup a topology on your Simulator of your choice having full connectivity with your Local System ip which is running this code , and save the ip address of Lan or Loopback ip of all the Devices running on Simulator in csv file and assign or copy-paste this csv file path as a value to variable 'branch_ip_address_for_pinging' then run the code.
-
-  ![alt text](https://github.com/shebin7/Network_Health_Check/blob/master/Snapshots/snap_assign_branch_ip.png)
 
 
 * When an Intermediate/Jump Server acts as Centralized Server.
 
   * Host(System/Laptop)----Intermediate/Jump Server(Linux)----Network_Devices  
+  ![alt text](https://github.com/shebin7/Network_Health_Check/blob/master/Snapshots/Intermediate_Server.png)
 
   When mirroring this in your'e System , you need to setup a topology on your Simulator of your choice , you must have connectivity with the Jump Server and The Jump Server should have connectivity with the Network Device in Simulator,your Jump Server will act as an Intermediate Server and through it you will connect to Network Devices , but the code will run and excute in the Local System/Host itself. 
 
