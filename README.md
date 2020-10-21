@@ -32,21 +32,20 @@ Network Devices and Platforms
 * CML2(VIRL 2) IOU and IOS Devices
 
 ## Usage (#)
----
+
 * Summary
-
-  Used Nornir , Netmiko Libraries for connecting Device.
+---
+  * Used Nornir , Netmiko Libraries for connecting Device.
     
-    - For Direct Access method Nornir Library is used,you need Inventory (hosts,groups,configs)YAML file,here only one Host IP specified on hosts file which is 
-      used for connecting Centralized/Aggregation router,branch's ip address and other information for testing devices will be used from csv file, which will be provide from user, my csv file is [Look Here](/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/blob/master/branch_ipaddress.csv),you can use youre custom csv file,the customs csv file path should be mentioned correctly on programme.
+      - For Direct Access method Nornir Library is used,you need Inventory (hosts,groups,configs)YAML file,here only one Host IP specified on hosts file which is 
+        used for connecting Centralized/Aggregation router,branch's ip address and other information for testing devices will be used from csv file, which will be provide from user, my csv file is [Look Here](/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/blob/master/branch_ipaddress.csv),you can use your custom csv file,the customs csv file path should be mentioned correctly on programme.
       
-      Assign your custom csv file with it's exact path like
-      ![alt text](/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/blob/master/Snapshots/snap_assign_branch_ip.
+        Assign your custom csv file with it's exact path like
+        ![alt text](/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/blob/master/Snapshots/snap_assign_branch_ip.
 
     
-    - For Indirect Access(through Intemediate Server)Netmiko Lirary is used,user need to specify the Ip Address and Login Credentials for the Intermediate/Jump
-      Server during runtime,default values will be used if no values provided,for user executing with Indirect Access method,branch's ip and other information will also rely on csv files file used by programme , custom csv files can also be used.
-
+      - For Indirect Access(through Intemediate Server)Netmiko Lirary is used,user need to specify the Ip Address and Login Credentials for the Intermediate/Jump
+        Server during runtime,default values will be used if no values provided,for user executing with Indirect Access method,branch's ip and other information will also rely on csv files file used by programme , custom csv files can also be used.
 ***
 
 
