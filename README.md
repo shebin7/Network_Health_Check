@@ -31,17 +31,18 @@ Network Devices and Platforms
 * EVE-NG IOU and IOS Devices
 * CML2(VIRL 2) IOU and IOS Devices
 
-## Usage (#)
+## Usage 
 
 * Summary
 ---
   * Used Nornir , Netmiko Libraries for connecting Device.
     
       - For Direct Access method Nornir Library is used,you need Inventory (hosts,groups,configs)YAML file,here only one Host IP specified on hosts file which is 
-        used for connecting Centralized/Aggregation router,branch's ip address and other information for testing devices will be used from csv file, which will be provide from user, my csv file is [Look Here](/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/blob/master/branch_ipaddress.csv),you can use your custom csv file,the customs csv file path should be mentioned correctly on programme.
+        used for connecting Centralized/Aggregation router,branch's ip address and other information for testing devices will be used from csv file, which will be provide from user, my csv file is [Look Here](https://github.com/shebin7/Network_Health_Check/blob/master/branch_ipaddress.csv),you can use your custom csv file,the customs csv file path should be mentioned correctly on programme.
       
-        Assign your custom csv file with it's exact path like
-        ![alt text](/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/blob/master/Snapshots/snap_assign_branch_ip.
+        # Assign csv   
+          Assigning custom csv file with it's exact path like
+          ![alt text](https://github.com/shebin7/Network_Health_Check/blob/master/Snapshots/snap_assign_branch_ip.png)
 
     
       - For Indirect Access(through Intemediate Server)Netmiko Lirary is used,user need to specify the Ip Address and Login Credentials for the Intermediate/Jump
@@ -54,7 +55,7 @@ Network Devices and Platforms
   * Host(System/Laptop)------Network_Devices
   ![alt text](https://github.com/shebin7/Network_Health_Check/blob/master/Snapshots/Direct.png)  
 
-  When mirroring this in your'e System , you need to setup a topology on your Simulator of your choice having full connectivity with your Local System ip which is running this code , and save the ip address of Lan or Loopback ip of all the Devices running on Simulator in csv file and assign or copy-paste this csv file path as a value to variable 'branch_ip_address_for_pinging' then run the code [Look here]()
+  When mirroring this in your'e System , you need to setup a topology on your Simulator of your choice having full connectivity with your Local System ip which is running this code , and save the ip address of Lan or Loopback ip of all the Devices running on Simulator in csv file and assign or copy-paste this csv file path as a value to variable 'branch_ip_address_for_pinging' then run the code [Look here](#assign-csv)
 
 
 * Execution from Centralized Server.
