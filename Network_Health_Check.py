@@ -90,7 +90,7 @@ console.print('Working...',style='green')
 
 def Intermediate_Server_ping_pattern_catcher(result_string):
     device_status = '' 
-    template_path ='/home/shebin/NETDEVOPS/Net_automation_Project/TEXTFSM_NEW/ping_linux.textfsm'
+    template_path ='/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/ping_linux.textfsm'
     with open(template_path,'r')as tm:
         ping_template = textfsm.TextFSM(tm)
 
@@ -119,104 +119,115 @@ def Intermediate_Server_ping_pattern_catcher(result_string):
         return device_status+'DOWN'
     
 
-Prompt_ASK = Prompt.ask("Enter ")
 
+prompt_str='\n IF YOU DONT KNOW THE HOSTNAME AND PORT TO [bold][blue]<CONNECT DEVICE>[/bold][/blue] JUST PRESS [bold][blue]<ENTER> [/bold][/blue]DEFAULT VALUES WILL BE SELECTED \n'
+console.print('Do you haves Access to Network Devices through',style='bold purple')
+console.print('\n JUMP/INTERMEDIATE SERVER ACCESS',style='bold green )
+console.print('DIRECT SYSTEM ACCESS \n',style='bold purple')
+Select_Method = Prompt.ask("[bold yellow]SELECT JUMP/INTERMEDIATE SERVER  DIRECT ACESS=",choices=['Intermediate','Direct'])
 
-def Intermediate_Server():
+if 'Intermediate' in Select_Method:
+    def Intermediate_Server():
 
-    pleae tel iip or default will be taken
-    jump_server={'device_type':'terminal_server','ip':str(server_ip),'username':str(server_username),
-    'password':str(server_password),'global_delay_factor':1}
-    net_connect = ConnectHandler(**jump_server)
+        pleae tel iip or default will be taken
+        jump_server={'device_type':'terminal_server','ip':str(server_ip),'username':str(server_username),
+            'password':str(server_password),'global_delay_factor':1}
+        net_connect = ConnectHandler(**jump_server)
 
-    try:
-        net_connect= ConnectHandler(**jump_server)
-        with alive_bar(num_rows-1)as bar:
-        with open(branch_ip_address_for_pinging,'r')as b_ip:
-            csv_d_reader = csv.DictReader(b_ip)
-            for row in csv_d_reader:
-                row_values={'ip' : row['IP_ADDRESS'],'solid' : row['Sol_ID'],'branch' : row['Branch_Name']}
+        try:
+            net_connect= ConnectHandler(**jump_server)
+            with alive_bar(num_rows-1)as bar:
+                with open(branch_ip_address_for_pinging,'r')as b_ip:
+                    csv_d_reader = csv.DictReader(b_ip)
+                    for row in csv_d_reader:
+                        row_values={'ip' : row['IP_ADDRESS'],'solid' : row['Sol_ID'],'branch' : row['Branch_Name']}
            
-                net_connect.write_channel('ping 192.168.122.12 -c 10 \n')
+                        net_connect.write_channel('ping 192.168.122.12 -c 10 \n')
 
-                write_channel_op_1=net_connect._read_channel_timing(delay_factor=2,max_loops=150)
+                        write_channel_op_1=net_connect._read_channel_timing(delay_factor=2,max_loops=150)
 
-                Device_Status=Intermediate_Server_ping_pattern_catcher(result_string=write_channel_op_1)
+                        Device_Status=Intermediate_Server_ping_pattern_catcher(result_string=write_channel_op_1)
 
-                if 'DOWN' in Device_Status:
+                        if 'DOWN' in Device_Status:
 
-                    with open(final_result_of_Health_Check,'a+')as wr:
+                            with open(final_result_of_Health_Check,'a+')as wr:
 
-                        csv_dictwrite = csv.DictWriter(wr,report_fields)                        
-                        csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'DOWN','TIME':Dtime})
-                        sol_id_down = style_down+row_values['solid']
-                        branch_down = style_down+row_values['branch']
-                        ip_down = style_down+row_values['ip']
-                        cli_table.add_row(sol_id_down,branch_down,ip_down,status_down)
+                                csv_dictwrite = csv.DictWriter(wr,report_fields)                        
+                                csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'DOWN','TIME':Dtime})
+                                sol_id_down = style_down+row_values['solid']
+                                branch_down = style_down+row_values['branch']
+                                ip_down = style_down+row_values['ip']
+                                cli_table.add_row(sol_id_down,branch_down,ip_down,status_down)
                 
-                else:
+                        else:
                     
-                    with open(final_result_of_Health_Check,'a+')as wr:
+                            with open(final_result_of_Health_Check,'a+')as wr:
 
-                        csv_dictwrite = csv.DictWriter(wr,report_fields)                        
-                        csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'DOWN','TIME':Dtime})
-                        sol_id_down = style_down+row_values['solid']
-                        branch_down = style_down+row_values['branch']
-                        ip_down = style_down+row_values['ip']
-                        cli_table.add_row(sol_id_up,branch_up,ip_up,status_up)
-                                          
-    except Exception:
-        print('Exception')
+                                csv_dictwrite = csv.DictWriter(wr,report_fields)                        
+                                csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'DOWN','TIME':Dtime})
+                                sol_id_down = style_down+row_values['solid']
+                                branch_down = style_down+row_values['branch']
+                                ip_down = style_down+row_values['ip']
+                                cli_table.add_row(sol_id_up,branch_up,ip_up,status_up)
 
-    finally:
-        net_connect.disconnect()
+            
 
-def Device_as_Server(task):
-   with alive_bar(num_rows-1)as bar:
-        with open(branch_ip_address_for_pinging,'r')as re:
-            csv_d_reader = csv.DictReader(re)
-            for row in csv_d_reader:
+        except Exception:
+            print('Exception')
+
+        finally:
+            net_connect.disconnect()
+    Intermediate_Server() 
+
+
+elif 'Direct' in Select_Method:
+    def Device_as_Server(task):
+        with alive_bar(num_rows-1)as bar:
+            with open(branch_ip_address_for_pinging,'r')as re:
+                csv_d_reader = csv.DictReader(re)
+                for row in csv_d_reader:
                  
-                row_values={'ip' : row['IP_ADDRESS'],'solid' : row['Sol_ID'],'branch' : row['Branch_Name']}
-                res = task.run(netmiko_send_command,command_string='ping '+row_values['ip'])
-                ping_search = res.result
-                if not '!!!' in ping_search:
+                    row_values={'ip' : row['IP_ADDRESS'],'solid' : row['Sol_ID'],'branch' : row['Branch_Name']}
+                    res = task.run(netmiko_send_command,command_string='ping '+row_values['ip'])
+                    ping_search = res.result
+                    if not '!!!' in ping_search:
 
-                    ### Opening New CSV and writing individual device 'Status' and their details ###
-                    with open(final_result_of_Health_Check,'a+')as wr:
-                       csv_dictwrite = csv.DictWriter(wr,report_fields)
-                       csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'DOWN','TIME':Dtime})
-                    
-                    
-                       sol_id_down = style_down+row_values['solid']
-                       branch_down = style_down+row_values['branch']
-                       ip_down = style_down+row_values['ip']
-                       cli_table.add_row(sol_id_down,branch_down,ip_down,status_down)
+                        ### Opening New CSV and writing individual device 'Status' and their details ###
+                        with open(final_result_of_Health_Check,'a+')as wr:
+                            csv_dictwrite = csv.DictWriter(wr,report_fields)
+                            csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'DOWN','TIME':Dtime})
+                                        
+                            sol_id_down = style_down+row_values['solid']
+                            branch_down = style_down+row_values['branch']
+                            ip_down = style_down+row_values['ip']
+                            cli_table.add_row(sol_id_down,branch_down,ip_down,status_down)
               
 
                                         
-                else:                    
-                    ### Opening New CSV and writing individual device 'Status' and their details ###
-                    with open(final_result_of_Health_Check,'a+')as wr:
-                       csv_dictwrite = csv.DictWriter(wr,report_fields)
-                       csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'UP','TIME':Dtime})
+                    else:                    
+                        ### Opening New CSV and writing individual device 'Status' and their details ###
+                        with open(final_result_of_Health_Check,'a+')as wr:
+                            csv_dictwrite = csv.DictWriter(wr,report_fields)
+                            csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'UP','TIME':Dtime})
 
                     
-                       sol_id_up = style_up+row_values['solid']
-                       branch_up = style_up+row_values['branch']
-                       ip_up = style_up+row_values['ip']
-                       cli_table.add_row(sol_id_up,branch_up,ip_up,status_up)
+                            sol_id_up = style_up+row_values['solid']
+                            branch_up = style_up+row_values['branch']
+                            ip_up = style_up+row_values['ip']
+                            cli_table.add_row(sol_id_up,branch_up,ip_up,status_up)
 
 
 
 ### Bar tracks/shows  ETA/Time needed to complete the execution ###    
-                bar()
+                    bar()
          
-                continue
+                    continue
 
 
-result_of_ping = nr.run(Network_Health_Check)
-result_of_ping
+    result_of_ping = nr.run(Device_as_Server)        
+    result_of_ping
+
+
 console.print(cli_table)
 
 ### Now writing csv rows to Excell sheet and filling it with colors based on Status ###

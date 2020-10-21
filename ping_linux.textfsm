@@ -1,0 +1,5 @@
+Value result (([a-zA-Z]{+\s*[a-zA-Z]+\s*[A-Za-z]+)|([a-zA-Z]*\s*[a-zA-Z]*)|([a-zA-Z]+\=\d+\s*[a-zA-Z]+\=(\d+|\d*.\d*)))
+
+
+Start
+  ^From 192.168.122.1 icmp_seq=\d*\s*${result}  -> Record
