@@ -10,6 +10,7 @@ from openpyxl import load_workbook
 from openpyxl.styles import *
 from alive_progress import alive_bar
 from datetime import *
+import textfsm
 import openpyxl
 import time
 import csv
@@ -25,7 +26,7 @@ Dtime = time_now.strftime("%H:%M:%S")
 config_file_yaml="/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/config.yaml"
 
 ### File path for all the Branch Ip Address which we will ping from central server to check connectivity ###
-branch_ip_address_for_pinging = "/home/shebin/NETDEVOPS/Net_automation_Project/csv_files/branch_ipaddress.csv"
+branch_ip_address_for_pinging = '/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/branch_ipaddress_2.csv'
 
 ### Final result Device Up or Down result will be stored here  in csv ###
 final_result_of_Health_Check="/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/"+str(date_today)+'__'+"final_result.csv"
@@ -86,9 +87,10 @@ console.print("[bold][red][blink]Warning![/blink][/red][/bold] [red][italic]PLEA
 console.print()
 console.print()
 console.print('Working...',style='green')
+time.sleep(0.5)
 
 
-def Intermediate_Server_ping_pattern_catcher(result_string):
+def Intermediate_Server_ping_pattern_catcher(result_string,device_status):
     device_status = '' 
     template_path ='/home/shebin/NETDEVOPS/Net_automation_Project/Network_Health_Check/ping_linux.textfsm'
     with open(template_path,'r')as tm:
@@ -106,7 +108,6 @@ def Intermediate_Server_ping_pattern_catcher(result_string):
     for i in dict_result:
         if 'time' in str(i['result']):
             count_ok=count_ok+1
-
         elif 'Destination' in str(i['result']):
             count_unreach =count_unreach+1
         elif 'Time' in str(i['result']):
@@ -121,18 +122,32 @@ def Intermediate_Server_ping_pattern_catcher(result_string):
 
 
 prompt_str='\n IF YOU DONT KNOW THE HOSTNAME AND PORT TO [bold][blue]<CONNECT DEVICE>[/bold][/blue] JUST PRESS [bold][blue]<ENTER> [/bold][/blue]DEFAULT VALUES WILL BE SELECTED \n'
-console.print('Do you haves Access to Network Devices through',style='bold purple')
-console.print('\n JUMP/INTERMEDIATE SERVER ACCESS',style='bold green )
-console.print('DIRECT SYSTEM ACCESS \n',style='bold purple')
-Select_Method = Prompt.ask("[bold yellow]SELECT JUMP/INTERMEDIATE SERVER  DIRECT ACESS=",choices=['Intermediate','Direct'])
+console.print('Do you have Access to Network Devices through',style='bold purple')
+console.print('\n[white]:right_arrow:[/white]JUMP/INTERMEDIATE SERVER ACCESS',style='bold green')
+console.print('[white]:right_arrow:[/white]DIRECT SYSTEM ACCESS\n',style='bold green')
+Select_Method = Prompt.ask("[bold yellow]SELECT JUMP/INTERMEDIATE SERVER [bold purple]OR[/bold purple DIRECT ACESS=",choices=['Intermediate','Direct'])
+
+
+
+
+prompt_str='\n IF YOU DONT KNOW THE HOSTNAME AND PORT TO [bold][blue]<CONNECT DEVICE>[/bold][/blue] JUST PRESS [bold][blue]<ENTER> [/bold][/blue]DEFAULT VALUES WILL BE SELECTED \n'
+server_ip=Prompt.ask('\n [bold yellow]Type your Intermediate/Jump Server IP ADDRESS=',default='192.168.4.133')
+server_username=Prompt.ask('\n [bold yellow]Type your Intermediate/Jump Server USERNAME=',default='shebin')
+server_password=Prompt.ask('\n [bold yellow]Type your Intermediate/Jump Server IP PASSWORD=',default='shebin123',show_default=False)
 
 if 'Intermediate' in Select_Method:
     def Intermediate_Server():
 
-        pleae tel iip or default will be taken
+        global server_ip,server_password,server_username
+        #prompt_str='\n IF YOU DONT KNOW THE HOSTNAME AND PORT TO [bold][blue]<CONNECT DEVICE>[/bold][/blue] JUST PRESS [bold][blue]<ENTER> [/bold][/blue]DEFAULT VALUES WILL BE SELECTED \n'
+        #server_ip=Prompt.ask('\n [bold yellow]Type your Intermediate/Jump Server IP ADDRESS=',default='192.168.4.133')
+        #server_username=Prompt.ask('\n [bold yellow]Type your Intermediate/Jump Server USERNAME=',default='shebin')
+        #server_password=Prompt.ask('\n [bold yellow]Type your Intermediate/Jump Server IP PASSWORD=',default='shebin123',show_default=False)
+
         jump_server={'device_type':'terminal_server','ip':str(server_ip),'username':str(server_username),
             'password':str(server_password),'global_delay_factor':1}
         net_connect = ConnectHandler(**jump_server)
+        print(net_connect.is_alive())
 
         try:
             net_connect= ConnectHandler(**jump_server)
@@ -142,13 +157,16 @@ if 'Intermediate' in Select_Method:
                     for row in csv_d_reader:
                         row_values={'ip' : row['IP_ADDRESS'],'solid' : row['Sol_ID'],'branch' : row['Branch_Name']}
            
-                        net_connect.write_channel('ping 192.168.122.12 -c 10 \n')
+                        net_connect.write_channel('ping '+row['IP_ADDRESS']+' -c 10 \n')
 
                         write_channel_op_1=net_connect._read_channel_timing(delay_factor=2,max_loops=150)
+                        print(write_channel_op_1)  
+ 
+                        Device_Status=Intermediate_Server_ping_pattern_catcher(result_string=write_channel_op_1,device_status='')
+                        Device_Status
+                        print(Device_Status)
 
-                        Device_Status=Intermediate_Server_ping_pattern_catcher(result_string=write_channel_op_1)
-
-                        if 'DOWN' in Device_Status:
+                        if Device_Status == 'DOWN':
 
                             with open(final_result_of_Health_Check,'a+')as wr:
 
@@ -165,18 +183,24 @@ if 'Intermediate' in Select_Method:
 
                                 csv_dictwrite = csv.DictWriter(wr,report_fields)                        
                                 csv_dictwrite.writerow({'SOL_ID':row['Sol_ID'],'IP_ADDRESS': row['IP_ADDRESS'],'BRANCH_NAME':row['Branch_Name'],'HEALTH_STATUS':'DOWN','TIME':Dtime})
-                                sol_id_down = style_down+row_values['solid']
-                                branch_down = style_down+row_values['branch']
-                                ip_down = style_down+row_values['ip']
+                                sol_id_up = style_up+row_values['solid']
+                                branch_up = style_up+row_values['branch']
+                                ip_up = style_down+row_values['ip']
                                 cli_table.add_row(sol_id_up,branch_up,ip_up,status_up)
 
+
+### Bar tracks/shows  ETA/Time needed to complete the execution ###   
+ 
+                        bar()
+                        continue
             
 
-        except Exception:
+        except ConnectionError:
             print('Exception')
 
         finally:
             net_connect.disconnect()
+ 
     Intermediate_Server() 
 
 
@@ -201,9 +225,7 @@ elif 'Direct' in Select_Method:
                             branch_down = style_down+row_values['branch']
                             ip_down = style_down+row_values['ip']
                             cli_table.add_row(sol_id_down,branch_down,ip_down,status_down)
-              
-
-                                        
+                                                      
                     else:                    
                         ### Opening New CSV and writing individual device 'Status' and their details ###
                         with open(final_result_of_Health_Check,'a+')as wr:
