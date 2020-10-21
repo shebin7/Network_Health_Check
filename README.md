@@ -69,5 +69,5 @@ $ python3 Network_Health_Check.py
 ```
 
 # Other Informations
-Working on adding an Option for Intermediate-Server or Jump-Server.
+Added two options to access(Direct or Through Intermediate Server) 
 
