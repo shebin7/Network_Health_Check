@@ -2,4 +2,4 @@ Value result (([a-zA-Z]{+\s*[a-zA-Z]+\s*[A-Za-z]+)|([a-zA-Z]*\s*[a-zA-Z]*)|([a-z
 
 
 Start
-  ^From 192.168.122.1 icmp_seq=\d*\s*${result}  -> Record
+  ^.*\s+192.168.122.1 icmp_seq=\d*\s*${result}  -> Record
